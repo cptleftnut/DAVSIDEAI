@@ -1,0 +1,112 @@
+# .github/workflows/android-build.yml
+name: DAVSIDE AI - Android Build & Release
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Android (${{ matrix.variant }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        variant: [debug, release]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android armv7-linux-androideabi
+
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --locked
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: frontend/package.json   # Fixed: bruger package.json i stedet for package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: |
+          if [ -f "bun.lockb" ]; then
+            curl -fsSL https://bun.sh/install | bash
+            \~/bin/bun install
+          else
+            npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+          fi
+
+      - name: Setup Android SDK & NDK
+        uses: android-actions/setup-android@v3
+        with:
+          ndk-version: r27
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build ${{ matrix.variant }} APK
+        env:
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+        run: |
+          if [ "${{ matrix.variant }}" = "release" ]; then
+            cargo tauri android build --release
+          else
+            cargo tauri android build --debug
+          fi
+
+      - name: Upload ${{ matrix.variant }} APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: davside-ai-${{ matrix.variant }}-apk
+          path: src-tauri/gen/android/app/build/outputs/apk/\( {{ matrix.variant }}/app- \){{ matrix.variant }}.apk
+          retention-days: 14# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "DAVSIDEAI" branch
+  push:
+    branches: [ "DAVSIDEAI" ]
+  pull_request:
+    branches: [ "DAVSIDEAI" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Hello, world!
+
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
+        run: |
+          echo Add other actions to build,
+          echo test, and deploy your project.
