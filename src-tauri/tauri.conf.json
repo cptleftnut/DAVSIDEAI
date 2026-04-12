@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "DAVSIDE AI",
+  "version": "0.3.0",
+  "identifier": "com.davside.ai",
+  "build": {
+    "frontendDist": "../frontend/dist",
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "bun run dev",
+    "beforeBuildCommand": "bun run build"
+  },
+  "app": {
+    "android": {
+      "packageName": "com.davside.ai",
+      "versionCode": 3,
+      "versionName": "0.3.0",
+      "minSdkVersion": 24,
+      "targetSdkVersion": 35,
+      "compileSdkVersion": 35
+    }
+  },
+  "capabilities": {
+    "http:default": {
+      "urls": ["https://api.x.ai/*"]
+    },
+    "store:default": {},
+    "dialog:save": {},
+    "fs:write": { "paths": ["$DOWNLOAD/**"] }
+  }
+}
