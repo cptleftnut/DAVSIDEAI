@@ -36,6 +36,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Initialiser Android projektet hvis det mangler
+          # Pakkenavn og version styres nu via tauri.conf.json i v2
           cargo tauri android init --ci
           # Byg selve APK'en
           cargo tauri android build --target aarch64-linux-android
