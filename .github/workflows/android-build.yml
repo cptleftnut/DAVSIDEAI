@@ -11,29 +11,48 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          
       - name: Install frontend deps
         working-directory: frontend
         run: npm install
+        
       - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
+          
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+          
       - name: Install Tauri CLI
         run: cargo install tauri-cli --version "^2.0.0"
+        
       - name: Build Android App
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Initialiser Android projektet hvis det mangler
+          # Pakkenavn og version styres nu primært via tauri.conf.json i v2
+          cargo tauri android init --ci
+          # Byg selve APK'en (brug kun arkitekturnavnet, ikke fuldt Rust-target format)
+          cargo tauri android build --target aarch64
+          
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: davside-ai-android-apk
+          path: src-tauri/gen/android/app/build/outputs/apk/release/*.apk
         run: |
           # Initialiser Android projektet hvis det mangler
           # Pakkenavn og version styres nu primært via tauri.conf.json i v2
