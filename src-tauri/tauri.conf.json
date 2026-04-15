@@ -10,21 +10,28 @@
     "beforeBuildCommand": "npm run build"
   },
   "app": {
+    "security": {
+      "capabilities": ["default"]
+    },
+    "windows": [
+      {
+        "title": "DAVSIDE AI",
+        "width": 800,
+        "height": 600,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ]
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
     "android": {
-      "packageName": "com.davside.ai",
-      "versionCode": 3,
-      "versionName": "0.3.0",
       "minSdkVersion": 24,
-      "targetSdkVersion": 35,
-      "compileSdkVersion": 35
+      "versionCode": 3
     }
   },
-  "capabilities": {
-    "http:default": {
-      "urls": ["https://api.x.ai/*"]
-    },
-    "store:default": {},
-    "dialog:save": {},
-    "fs:write": { "paths": ["$DOWNLOAD/**"] }
+  "plugins": {
+    "store": {}
   }
 }
