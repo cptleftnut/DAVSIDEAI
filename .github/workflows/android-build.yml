@@ -36,7 +36,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Initialiser Android projektet hvis det mangler
-          cargo tauri android init --package-name com.davside.ai --version-code 3 --version-name 0.3.0
+          cargo tauri android init --ci
           # Byg selve APK'en
           cargo tauri android build --target aarch64-linux-android
       - name: Upload APK
