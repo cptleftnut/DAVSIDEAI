@@ -7,15 +7,6 @@ on:
   workflow_dispatch:
 jobs:
   build:
-  - name: Build Android App
-  working-directory: frontend
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  run: |
-    npm run build
-    cd ../
-    cargo tauri android init --ci
-    cargo tauri android build --target aarch64
     name: Build Android
     runs-on: ubuntu-latest
     steps:
@@ -51,9 +42,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Initialiser Android projektet hvis det mangler
           cargo tauri android init --ci
-          # Byg selve APK'en
           cargo tauri android build --target aarch64
           
       - name: Upload APK
