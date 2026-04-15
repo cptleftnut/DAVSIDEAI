@@ -3,6 +3,10 @@ name = "davside-ai"
 version = "0.3.0"
 edition = "2021"
 
+[lib]
+name = "davside_ai"
+path = "src/lib.rs"
+
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
