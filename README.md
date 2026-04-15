@@ -1,16 +1,44 @@
-# DAVSIDE AI
+# DAVSIDE AI 🏠
 
-En let, mobil-first AI boligagent med Grok Imagine.
+**Din intelligente AI-boligagent** – en Tauri-mobilapp til det danske boligmarked.
 
-**Features:**
-- Avanceret boligsøgning med danske boligdata
-- Virtual Staging (billeder + video)
-- Forhandlingsagent
-- Kontrakt-tjek
-- Mobil-optimeret UI
-- Setup Wizard med API-nøgle validering
+## Funktioner
 
-**Kør projektet:**
+| Funktion | Beskrivelse |
+|---|---|
+| 🔍 **Boligsøgning** | Søg boliger i hele Danmark med AI-scoring og filtrering |
+| 🤝 **Forhandlingsagent** | AI-drevet forhandlingsstrategi med markedsdata og taktikker |
+| 📄 **Kontrakt-tjek** | Analysér lejekontrakten for ulovlige klausuler og problemer |
+| 📷 **Virtual Staging** | Transformér boligbilleder med AI-styling (6 stilarter) |
+
+## Tech Stack
+
+- **Frontend**: Svelte 5 + TypeScript + Vite + TailwindCSS
+- **Backend**: Rust + Tauri
+- **AI**: Grok (xAI) API til analyse og staging
+
+## Kom i gang
+
 ```bash
-cargo tauri android dev
+# Installer afhængigheder
+cd frontend && npm install
+
+# Start dev server
+npm run dev
+
+# Byg til produktion
+npm run build
+```
+
+## Konfiguration
+
+Tilføj din Grok API-nøgle via Setup Wizard (første gang) eller Indstillinger (⚙️).
+
+## Standalone Web Version
+
+En komplet standalone HTML-version uden afhængigheder findes i `frontend/dist/index.html`.
+Åbn den direkte i en browser eller server den med en simpel HTTP-server:
+
+```bash
+cd frontend/dist && python3 -m http.server 8080
 ```
