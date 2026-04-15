@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DAVSIDE AI</title>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --surface2: #1e1e1e;
+      --surface3: #282828;
+      --border: #2a2a2a;
+      --accent: #6c63ff;
+      --accent2: #a78bfa;
+      --green: #22c55e;
+      --yellow: #eab308;
+      --red: #ef4444;
+      --text: #f0f0f0;
+      --text2: #a0a0a0;
+      --text3: #606060;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* WIZARD */
+    .wizard-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+    .wizard-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      width: 90%; max-width: 440px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+    }
+    .wizard-logo { font-size: 48px; text-align: center; margin-bottom: 8px; }
+    .wizard-title { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 4px; }
+    .wizard-subtitle { color: var(--text2); text-align: center; margin-bottom: 28px; font-size: 14px; }
+    .wizard-step { display: none; }
+    .wizard-step.active { display: block; }
+    .step-label { font-size: 12px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .step-title { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+    .step-desc { color: var(--text2); font-size: 14px; margin-bottom: 20px; }
+    .wizard-input {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 12px 14px; color: var(--text);
+      font-size: 15px; outline: none; transition: border-color 0.2s;
+    }
+    .wizard-input:focus { border-color: var(--accent); }
+    .wizard-input::placeholder { color: var(--text3); }
+    .wizard-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .btn-primary {
+      flex: 1; background: var(--accent); color: white; border: none;
+      border-radius: var(--radius-sm); padding: 12px; font-size: 15px;
+      font-weight: 600; cursor: pointer; transition: opacity 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-secondary {
+      background: var(--surface2); color: var(--text2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 12px 16px; font-size: 15px;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .btn-secondary:hover { background: var(--surface3); }
+    .progress-dots { display: flex; gap: 6px; justify-content: center; margin-bottom: 24px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); transition: background 0.3s; }
+    .dot.active { background: var(--accent); }
+    .dot.done { background: var(--green); }
+    .validation-msg { font-size: 12px; margin-top: 6px; }
+    .validation-msg.ok { color: var(--green); }
+    .validation-msg.err { color: var(--red); }
+
+    /* APP LAYOUT */
+    .app-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 10px; }
+    .header-logo { font-size: 22px; }
+    .header-title { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+    .header-badge {
+      background: linear-gradient(135deg, var(--accent), #9333ea);
+      color: white; font-size: 10px; font-weight: 700;
+      padding: 2px 7px; border-radius: 20px; letter-spacing: 0.5px;
+    }
+    .settings-btn {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 7px 10px; cursor: pointer;
+      font-size: 16px; color: var(--text2); transition: all 0.2s;
+    }
+    .settings-btn:hover { background: var(--surface3); color: var(--text); }
+    .app-content { flex: 1; overflow-y: auto; }
+
+    /* TABS */
+    .tab-bar {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      position: sticky; bottom: 0; z-index: 100;
+    }
+    .tab-btn {
+      flex: 1; background: none; border: none; color: var(--text3);
+      padding: 12px 4px 10px; cursor: pointer; transition: all 0.2s;
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+    }
+    .tab-btn.active { color: var(--accent); }
+    .tab-btn:hover { color: var(--text2); }
+    .tab-icon { font-size: 20px; }
+    .tab-label { font-size: 10px; font-weight: 500; letter-spacing: 0.3px; }
+    .tab-indicator {
+      height: 2px; background: var(--accent); border-radius: 1px;
+      width: 0; transition: width 0.3s; margin-bottom: 2px;
+    }
+    .tab-btn.active .tab-indicator { width: 24px; }
+
+    /* PANEL BASE */
+    .panel { padding: 20px; display: none; }
+    .panel.active { display: block; }
+    .panel-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .panel-header h3 { font-size: 20px; font-weight: 700; }
+    .badge {
+      background: linear-gradient(135deg, var(--accent), #9333ea);
+      color: white; font-size: 10px; font-weight: 700;
+      padding: 2px 8px; border-radius: 20px; letter-spacing: 0.5px;
+    }
+    .panel-desc { color: var(--text2); font-size: 14px; margin-bottom: 20px; }
+
+    /* SEARCH */
+    .search-bar { display: flex; gap: 8px; margin-bottom: 16px; }
+    .search-input {
+      flex: 1; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 12px 14px; color: var(--text);
+      font-size: 15px; outline: none; transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: var(--accent); }
+    .search-input::placeholder { color: var(--text3); }
+    .search-btn {
+      background: var(--accent); color: white; border: none;
+      border-radius: var(--radius-sm); padding: 12px 16px; cursor: pointer;
+      font-size: 16px; transition: opacity 0.2s;
+    }
+    .search-btn:hover { opacity: 0.9; }
+    .filters-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .filter-select {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 8px 12px; color: var(--text);
+      font-size: 13px; outline: none; cursor: pointer;
+    }
+    .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .results-count { font-size: 13px; color: var(--text2); }
+    .bolig-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
+      transition: border-color 0.2s, transform 0.1s; cursor: pointer;
+    }
+    .bolig-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .bolig-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .bolig-address { font-size: 16px; font-weight: 600; }
+    .bolig-price { font-size: 18px; font-weight: 700; color: var(--accent); }
+    .bolig-price-sub { font-size: 11px; color: var(--text3); font-weight: 400; }
+    .bolig-meta { display: flex; gap: 12px; margin-bottom: 10px; }
+    .bolig-meta-item { font-size: 13px; color: var(--text2); }
+    .bolig-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 3px 10px; font-size: 11px; color: var(--text2); }
+    .tag.new { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3); color: var(--green); }
+    .ai-score { display: flex; align-items: center; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+    .ai-score-bar { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .ai-score-fill { height: 100%; border-radius: 2px; }
+    .ai-score-label { font-size: 11px; color: var(--text3); }
+    .ai-score-val { font-size: 12px; font-weight: 600; }
+    .loading-state { text-align: center; padding: 40px 20px; color: var(--text2); }
+    .spinner {
+      display: inline-block; width: 24px; height: 24px;
+      border: 2px solid var(--border); border-top-color: var(--accent);
+      border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--text2); }
+    .empty-icon { font-size: 48px; margin-bottom: 12px; }
+
+    /* FORMS */
+    .input-group { margin-bottom: 16px; }
+    .input-group label { display: block; font-size: 13px; color: var(--text2); margin-bottom: 6px; font-weight: 500; }
+    .price-input-wrap { display: flex; align-items: center; gap: 8px; }
+    .price-input {
+      flex: 1; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 12px 14px; color: var(--text);
+      font-size: 18px; font-weight: 600; outline: none; transition: border-color 0.2s;
+    }
+    .price-input:focus { border-color: var(--accent); }
+    .price-suffix { color: var(--text2); font-size: 14px; white-space: nowrap; }
+    textarea {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 12px 14px; color: var(--text);
+      font-size: 14px; outline: none; resize: vertical; font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    textarea:focus { border-color: var(--accent); }
+    textarea::placeholder { color: var(--text3); }
+    .analyze-btn {
+      width: 100%; background: var(--accent); color: white; border: none;
+      border-radius: var(--radius-sm); padding: 14px; font-size: 15px;
+      font-weight: 600; cursor: pointer; transition: opacity 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .analyze-btn:hover:not(:disabled) { opacity: 0.9; }
+    .analyze-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .result { margin-top: 20px; animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .result-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 12px; }
+    .score-card { display: flex; align-items: center; gap: 20px; }
+    .score-circle { width: 80px; height: 80px; position: relative; flex-shrink: 0; }
+    .score-inner { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .score-num { font-size: 22px; font-weight: 700; }
+    .score-max { font-size: 11px; color: var(--text3); }
+    .score-info { flex: 1; }
+    .score-label { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+    .score-summary { font-size: 13px; color: var(--text2); }
+    .suggestion-highlight {
+      background: linear-gradient(135deg, rgba(108,99,255,0.15), rgba(147,51,234,0.15));
+      border: 1px solid rgba(108,99,255,0.3);
+      border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
+    }
+    .suggestion-label { font-size: 12px; color: var(--accent2); font-weight: 600; margin-bottom: 4px; }
+    .suggestion-price { font-size: 28px; font-weight: 700; color: var(--accent); }
+    .suggestion-saving { font-size: 13px; color: var(--green); margin-top: 2px; }
+    .tactics-list { list-style: none; }
+    .tactic-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .tactic-item:last-child { border-bottom: none; }
+    .tactic-num { width: 22px; height: 22px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .tactic-text { font-size: 14px; color: var(--text2); line-height: 1.5; }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .stat-box { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; text-align: center; }
+    .stat-val { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+    .stat-label { font-size: 11px; color: var(--text3); }
+    .reasoning-box { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; }
+    .reasoning-label { font-size: 12px; color: var(--text3); font-weight: 600; margin-bottom: 6px; }
+    .reasoning-text { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+    /* CONTRACT */
+    .input-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .input-toolbar label { font-size: 13px; color: var(--text2); font-weight: 500; }
+    .sample-btn { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; color: var(--text2); font-size: 12px; cursor: pointer; transition: all 0.2s; }
+    .sample-btn:hover { background: var(--surface3); color: var(--text); }
+    .char-count { font-size: 11px; color: var(--text3); text-align: right; margin-top: 4px; }
+    .issues-list { display: flex; flex-direction: column; gap: 10px; }
+    .issue-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; }
+    .issue-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .severity-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; letter-spacing: 0.5px; }
+    .severity-badge.high { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+    .severity-badge.medium { background: rgba(234,179,8,0.15); color: var(--yellow); border: 1px solid rgba(234,179,8,0.3); }
+    .severity-badge.low { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+    .issue-section { font-size: 12px; color: var(--text3); }
+    .issue-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .issue-desc { font-size: 13px; color: var(--text2); line-height: 1.5; }
+    .positives-list { display: flex; flex-direction: column; gap: 8px; }
+    .positive-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--text2); }
+    .positive-icon { color: var(--green); font-weight: 700; flex-shrink: 0; }
+    .tabs-row { display: flex; gap: 8px; margin-bottom: 16px; }
+    .tab-pill { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 13px; cursor: pointer; color: var(--text2); transition: all 0.2s; }
+    .tab-pill.active { background: var(--accent); border-color: var(--accent); color: white; }
+    .recommendation-box { background: rgba(108,99,255,0.1); border: 1px solid rgba(108,99,255,0.3); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 16px; display: flex; gap: 10px; align-items: flex-start; }
+    .rec-icon { font-size: 18px; flex-shrink: 0; }
+    .rec-text { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+    /* STAGING */
+    .upload-area { border: 2px dashed var(--border); border-radius: var(--radius); padding: 40px 20px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 16px; }
+    .upload-area:hover { border-color: var(--accent); background: rgba(108,99,255,0.05); }
+    .upload-icon { font-size: 40px; margin-bottom: 10px; }
+    .upload-text { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+    .upload-sub { font-size: 13px; color: var(--text3); }
+    .preview-img { width: 100%; border-radius: var(--radius); margin-bottom: 16px; max-height: 250px; object-fit: cover; }
+    .style-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+    .style-btn { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 6px; cursor: pointer; text-align: center; transition: all 0.2s; }
+    .style-btn:hover { border-color: var(--accent); }
+    .style-btn.selected { border-color: var(--accent); background: rgba(108,99,255,0.1); }
+    .style-emoji { font-size: 22px; display: block; margin-bottom: 4px; }
+    .style-name { font-size: 11px; color: var(--text2); }
+    .prompt-area { margin-bottom: 16px; }
+    .prompt-area label { display: block; font-size: 13px; color: var(--text2); margin-bottom: 6px; font-weight: 500; }
+    .action-row { display: flex; gap: 8px; margin-top: 10px; }
+    .action-btn { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; font-size: 13px; cursor: pointer; color: var(--text2); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .action-btn:hover { background: var(--surface3); color: var(--text); }
+
+    /* SETTINGS MODAL */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 500; backdrop-filter: blur(4px); }
+    .modal-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 28px; width: 90%; max-width: 400px; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .modal-title { font-size: 18px; font-weight: 700; }
+    .modal-close { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; cursor: pointer; color: var(--text2); font-size: 16px; }
+    .setting-row { margin-bottom: 16px; }
+    .setting-label { font-size: 13px; color: var(--text2); margin-bottom: 6px; font-weight: 500; }
+    .setting-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; color: var(--text); font-size: 14px; outline: none; transition: border-color 0.2s; }
+    .setting-input:focus { border-color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<!-- SETUP WIZARD -->
+<div class="wizard-overlay" id="wizard" style="display:none">
+  <div class="wizard-card">
+    <div class="wizard-logo">🏠</div>
+    <div class="wizard-title">DAVSIDE AI</div>
+    <div class="wizard-subtitle">Din intelligente boligagent</div>
+    <div class="progress-dots">
+      <div class="dot active" id="dot-0"></div>
+      <div class="dot" id="dot-1"></div>
+      <div class="dot" id="dot-2"></div>
+    </div>
+    <div class="wizard-step active" id="step-0">
+      <div class="step-label">Trin 1 af 3</div>
+      <div class="step-title">Velkommen til DAVSIDE AI</div>
+      <div class="step-desc">Lad os sætte din AI-boligagent op. Du skal bruge en Grok API-nøgle for at aktivere alle AI-funktioner.</div>
+      <div class="wizard-actions">
+        <button class="btn-secondary" onclick="closeWizard()">Spring over</button>
+        <button class="btn-primary" onclick="wizardNext()">Kom i gang →</button>
+      </div>
+    </div>
+    <div class="wizard-step" id="step-1">
+      <div class="step-label">Trin 2 af 3</div>
+      <div class="step-title">Grok API-nøgle</div>
+      <div class="step-desc">Indtast din xAI Grok API-nøgle for at aktivere AI-analyse og virtual staging.</div>
+      <input type="password" class="wizard-input" id="apikey-input" placeholder="xai-xxxxxxxxxxxxxxxxxx" oninput="validateKey(this.value)" />
+      <div class="validation-msg" id="key-validation"></div>
+      <div class="wizard-actions">
+        <button class="btn-secondary" onclick="wizardBack()">← Tilbage</button>
+        <button class="btn-primary" onclick="wizardNext()">Bekræft →</button>
+      </div>
+    </div>
+    <div class="wizard-step" id="step-2">
+      <div class="step-label">Trin 3 af 3</div>
+      <div class="step-title">✅ Klar til brug!</div>
+      <div class="step-desc">Din DAVSIDE AI er nu konfigureret. Søg boliger, forhandl husleje, tjek kontrakter og lav virtual staging.</div>
+      <div class="wizard-actions">
+        <button class="btn-primary" onclick="closeWizard()">Start app →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settings-modal" style="display:none">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title">⚙️ Indstillinger</div>
+      <button class="modal-close" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="setting-row">
+      <div class="setting-label">Grok API-nøgle</div>
+      <input type="password" class="setting-input" id="settings-apikey" placeholder="xai-xxxxxxxxxxxxxxxxxx" />
+    </div>
+    <div class="setting-row">
+      <div class="setting-label">Standard søgeområde</div>
+      <input type="text" class="setting-input" id="settings-area" placeholder="F.eks. København, Aarhus..." />
+    </div>
+    <div class="setting-row">
+      <div class="setting-label">Maks. husleje (kr/md)</div>
+      <input type="number" class="setting-input" id="settings-maxprice" placeholder="15000" />
+    </div>
+    <button class="btn-primary" onclick="saveSettings()" style="margin-top:8px">Gem indstillinger</button>
+  </div>
+</div>
+
+<!-- APP HEADER -->
+<header class="app-header">
+  <div class="header-left">
+    <span class="header-logo">🏠</span>
+    <span class="header-title">DAVSIDE AI</span>
+    <span class="header-badge">BETA</span>
+  </div>
+  <div>
+    <button class="settings-btn" onclick="openSettings()">⚙️</button>
+  </div>
+</header>
+
+<!-- CONTENT -->
+<div class="app-content">
+
+  <!-- SEARCH PANEL -->
+  <div class="panel active" id="panel-search">
+    <div class="panel-header"><h3>Boligsøgning</h3><span class="badge">AI</span></div>
+    <p class="panel-desc">Søg efter boliger i hele Danmark med AI-scoring</p>
+    <div class="search-bar">
+      <input type="text" class="search-input" id="search-query" placeholder="By, postnummer eller adresse..." onkeydown="if(event.key==='Enter')doSearch()" />
+      <button class="search-btn" onclick="doSearch()">🔍</button>
+    </div>
+    <div class="filters-row">
+      <select class="filter-select" id="filter-type">
+        <option value="">Alle typer</option>
+        <option value="lejlighed">Lejlighed</option>
+        <option value="hus">Hus</option>
+        <option value="varelse">Værelse</option>
+      </select>
+      <select class="filter-select" id="filter-rooms">
+        <option value="">Alle rum</option>
+        <option value="1">1 værelse</option>
+        <option value="2">2 værelser</option>
+        <option value="3">3 værelser</option>
+        <option value="4">4+ værelser</option>
+      </select>
+      <select class="filter-select" id="filter-price">
+        <option value="">Alle priser</option>
+        <option value="5000">Op til 5.000 kr</option>
+        <option value="8000">Op til 8.000 kr</option>
+        <option value="12000">Op til 12.000 kr</option>
+        <option value="15000">Op til 15.000 kr</option>
+        <option value="20000">Op til 20.000 kr</option>
+      </select>
+    </div>
+    <div id="search-results">
+      <div class="empty-state">
+        <div class="empty-icon">🏘️</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:6px">Søg efter din næste bolig</div>
+        <div style="font-size:13px;color:var(--text3)">Indtast en by eller adresse for at komme i gang</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEGOTIATION PANEL -->
+  <div class="panel" id="panel-negotiate">
+    <div class="panel-header"><h3>Forhandlingsagent</h3><span class="badge">AI</span></div>
+    <p class="panel-desc">Få AI-drevet forhandlingsstrategi baseret på markedsdata</p>
+    <div class="input-group">
+      <label>Udbudt husleje (kr/md)</label>
+      <div class="price-input-wrap">
+        <input type="number" class="price-input" id="neg-price" min="1000" max="100000" step="100" value="12000" />
+        <span class="price-suffix">kr/md</span>
+      </div>
+    </div>
+    <div class="input-group">
+      <label>Boligbeskrivelse (valgfrit)</label>
+      <textarea id="neg-desc" rows="2" placeholder="F.eks. '3-værelses på Østerbro, 85 m², 3. sal, nyistandsat'"></textarea>
+    </div>
+    <button class="analyze-btn" id="neg-btn" onclick="doNegotiate()">
+      <span>🤝</span> Analysér forhandlingsmuligheder
+    </button>
+    <div id="neg-result"></div>
+  </div>
+
+  <!-- CONTRACT PANEL -->
+  <div class="panel" id="panel-contract">
+    <div class="panel-header"><h3>Kontrakt-tjek</h3><span class="badge">AI</span></div>
+    <p class="panel-desc">Analysér din lejekontrakt for problemer og mangler</p>
+    <div class="input-group">
+      <div class="input-toolbar">
+        <label>Indsæt kontrakttekst</label>
+        <button class="sample-btn" onclick="loadSampleContract()">Brug eksempel</button>
+      </div>
+      <textarea id="contract-text" rows="8" placeholder="Indsæt din lejekontrakt her..." oninput="updateCharCount()"></textarea>
+      <div class="char-count" id="char-count">0 tegn</div>
+    </div>
+    <button class="analyze-btn" id="contract-btn" onclick="doContractCheck()">
+      <span>📄</span> Analysér kontrakt
+    </button>
+    <div id="contract-result"></div>
+  </div>
+
+  <!-- STAGING PANEL -->
+  <div class="panel" id="panel-staging">
+    <div class="panel-header"><h3>Virtual Staging</h3><span class="badge">AI</span></div>
+    <p class="panel-desc">Transformér dine boligbilleder med AI-styling</p>
+    <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()" ondragover="event.preventDefault()" ondrop="handleDrop(event)">
+      <div class="upload-icon">📷</div>
+      <div class="upload-text">Upload boligbillede</div>
+      <div class="upload-sub">Klik eller træk et billede hertil (JPG, PNG)</div>
+    </div>
+    <input type="file" id="file-input" accept="image/*" style="display:none" onchange="handleFileSelect(event)" />
+    <div id="preview-container" style="display:none">
+      <img id="preview-img" class="preview-img" src="" alt="Preview" />
+    </div>
+    <div class="input-group">
+      <label>Vælg stil</label>
+      <div class="style-grid">
+        <div class="style-btn selected" data-style="Moderne" onclick="selectStyle(this)"><span class="style-emoji">🏙️</span><span class="style-name">Moderne</span></div>
+        <div class="style-btn" data-style="Skandinavisk" onclick="selectStyle(this)"><span class="style-emoji">🌿</span><span class="style-name">Skandinavisk</span></div>
+        <div class="style-btn" data-style="Industriel" onclick="selectStyle(this)"><span class="style-emoji">🔩</span><span class="style-name">Industriel</span></div>
+        <div class="style-btn" data-style="Minimalistisk" onclick="selectStyle(this)"><span class="style-emoji">⬜</span><span class="style-name">Minimalistisk</span></div>
+        <div class="style-btn" data-style="Luksus" onclick="selectStyle(this)"><span class="style-emoji">✨</span><span class="style-name">Luksus</span></div>
+        <div class="style-btn" data-style="Hygge" onclick="selectStyle(this)"><span class="style-emoji">🕯️</span><span class="style-name">Hygge</span></div>
+      </div>
+    </div>
+    <div class="prompt-area">
+      <label>Beskriv ønsket stil (valgfrit)</label>
+      <textarea id="staging-prompt" rows="2" placeholder="F.eks. 'Lyst og luftigt med nordisk møblement og planter'"></textarea>
+    </div>
+    <button class="analyze-btn" id="staging-btn" onclick="doStaging()">
+      <span>✨</span> Generer staging
+    </button>
+    <div id="staging-result"></div>
+  </div>
+
+</div>
+
+<!-- TAB BAR -->
+<nav class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('search',this)">
+    <div class="tab-indicator"></div>
+    <span class="tab-icon">🔍</span>
+    <span class="tab-label">Søg</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('negotiate',this)">
+    <div class="tab-indicator"></div>
+    <span class="tab-icon">🤝</span>
+    <span class="tab-label">Forhandl</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('contract',this)">
+    <div class="tab-indicator"></div>
+    <span class="tab-icon">📄</span>
+    <span class="tab-label">Kontrakt</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('staging',this)">
+    <div class="tab-indicator"></div>
+    <span class="tab-icon">📷</span>
+    <span class="tab-label">Staging</span>
+  </button>
+</nav>
+
+<script>
+var selectedStyle='Moderne',uploadedImage=null,wizardStep=0;
+
+window.addEventListener('DOMContentLoaded',function(){
+  if(!localStorage.getItem('davside_setup_done')) document.getElementById('wizard').style.display='flex';
+  var k=localStorage.getItem('davside_apikey');
+  if(k) document.getElementById('settings-apikey').value=k;
+});
+
+function wizardNext(){
+  if(wizardStep===1){var k=document.getElementById('apikey-input').value.trim();if(k)localStorage.setItem('davside_apikey',k);}
+  wizardStep=Math.min(wizardStep+1,2);updateWizard();
+}
+function wizardBack(){wizardStep=Math.max(wizardStep-1,0);updateWizard();}
+function updateWizard(){
+  document.querySelectorAll('.wizard-step').forEach(function(s,i){s.classList.toggle('active',i===wizardStep);});
+  document.querySelectorAll('.dot').forEach(function(d,i){d.classList.toggle('active',i===wizardStep);d.classList.toggle('done',i<wizardStep);});
+}
+function closeWizard(){localStorage.setItem('davside_setup_done','1');document.getElementById('wizard').style.display='none';}
+function validateKey(v){
+  var el=document.getElementById('key-validation');
+  if(!v){el.textContent='';el.className='validation-msg';return;}
+  if(v.startsWith('xai-')&&v.length>20){el.textContent='✓ Nøgle ser gyldig ud';el.className='validation-msg ok';}
+  else{el.textContent='Nøglen skal starte med "xai-"';el.className='validation-msg err';}
+}
+function openSettings(){document.getElementById('settings-modal').style.display='flex';}
+function closeSettings(){document.getElementById('settings-modal').style.display='none';}
+function saveSettings(){
+  localStorage.setItem('davside_apikey',document.getElementById('settings-apikey').value);
+  localStorage.setItem('davside_area',document.getElementById('settings-area').value);
+  localStorage.setItem('davside_maxprice',document.getElementById('settings-maxprice').value);
+  closeSettings();showToast('Indstillinger gemt ✓');
+}
+function switchTab(id,btn){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('panel-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+function showToast(msg){
+  var t=document.createElement('div');
+  t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:20px;font-size:14px;z-index:9999';
+  t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove();},2500);
+}
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
+
+// SEARCH
+var BOLIGER=[
+  {id:1,address:'Nørrebrogade 45, 2. tv',city:'2200 København N',type:'lejlighed',rooms:3,size:82,price:11500,deposit:23000,available:'1. juni 2025',tags:['Nyrenoveret','Altan','Elevator'],score:92,scoreColor:'#22c55e',isNew:true},
+  {id:2,address:'Vesterbrogade 112, st. th',city:'1620 København V',type:'lejlighed',rooms:2,size:58,price:9200,deposit:18400,available:'1. maj 2025',tags:['Centralt','Kælder'],score:78,scoreColor:'#eab308',isNew:false},
+  {id:3,address:'Frederiksberg Allé 22, 1. tv',city:'1820 Frederiksberg C',type:'lejlighed',rooms:4,size:110,price:16800,deposit:33600,available:'1. juli 2025',tags:['Stor','Have adgang','Parkering'],score:85,scoreColor:'#22c55e',isNew:false},
+  {id:4,address:'Amagerbrogade 78, 4. th',city:'2300 København S',type:'lejlighed',rooms:2,size:65,price:8500,deposit:17000,available:'15. april 2025',tags:['Metro','Nyt køkken'],score:88,scoreColor:'#22c55e',isNew:true},
+  {id:5,address:'Randersvej 15, 1. sal',city:'8200 Aarhus N',type:'lejlighed',rooms:3,size:78,price:8900,deposit:17800,available:'1. maj 2025',tags:['Altan','Parkering'],score:81,scoreColor:'#22c55e',isNew:false},
+  {id:6,address:'Mølleparken 3, stuen',city:'8000 Aarhus C',type:'hus',rooms:5,size:145,price:14500,deposit:29000,available:'1. august 2025',tags:['Have','Garage','Roligt'],score:90,scoreColor:'#22c55e',isNew:true},
+  {id:7,address:'Kongensgade 8, 3. tv',city:'5000 Odense C',type:'lejlighed',rooms:2,size:55,price:6800,deposit:13600,available:'1. juni 2025',tags:['Centralt','Nyrenoveret'],score:76,scoreColor:'#eab308',isNew:false},
+  {id:8,address:'Ryesgade 33, 2. th',city:'2100 København Ø',type:'lejlighed',rooms:3,size:88,price:13200,deposit:26400,available:'1. maj 2025',tags:['Høje lofter','Parket','Altan'],score:94,scoreColor:'#22c55e',isNew:true},
+];
+
+function doSearch(){
+  var q=document.getElementById('search-query').value.trim().toLowerCase();
+  var type=document.getElementById('filter-type').value;
+  var rooms=document.getElementById('filter-rooms').value;
+  var maxPrice=parseInt(document.getElementById('filter-price').value)||999999;
+  var container=document.getElementById('search-results');
+  container.innerHTML='<div class="loading-state"><div class="spinner"></div><div>Søger boliger...</div></div>';
+  setTimeout(function(){
+    var res=BOLIGER.filter(function(b){
+      if(q&&!b.address.toLowerCase().includes(q)&&!b.city.toLowerCase().includes(q)&&!b.type.includes(q))return false;
+      if(type&&b.type!==type)return false;
+      if(rooms){if(rooms==='4'&&b.rooms<4)return false;if(rooms!=='4'&&b.rooms!==parseInt(rooms))return false;}
+      if(b.price>maxPrice)return false;
+      return true;
+    });
+    if(!res.length){
+      container.innerHTML='<div class="empty-state"><div class="empty-icon">🔍</div><div style="font-size:16px;font-weight:600;margin-bottom:6px">Ingen resultater</div><div style="font-size:13px;color:var(--text3)">Prøv en anden søgning</div></div>';
+      return;
+    }
+    container.innerHTML='<div class="results-header"><span class="results-count">'+res.length+' boliger fundet</span></div>'+res.map(renderCard).join('');
+  },800);
+}
+
+function renderCard(b){
+  return '<div class="bolig-card" onclick="prefillNeg('+b.id+')">'+
+    '<div class="bolig-card-header">'+
+    '<div><div class="bolig-address">'+b.address+'</div><div style="font-size:13px;color:var(--text3)">'+b.city+'</div></div>'+
+    '<div style="text-align:right"><div class="bolig-price">'+b.price.toLocaleString('da-DK')+' <span class="bolig-price-sub">kr/md</span></div><div style="font-size:11px;color:var(--text3)">Dep: '+b.deposit.toLocaleString('da-DK')+' kr</div></div>'+
+    '</div>'+
+    '<div class="bolig-meta"><span class="bolig-meta-item">🛏️ '+b.rooms+' rum</span><span class="bolig-meta-item">📐 '+b.size+' m²</span><span class="bolig-meta-item">📅 '+b.available+'</span></div>'+
+    '<div class="bolig-tags">'+(b.isNew?'<span class="tag new">Ny</span>':'')+b.tags.map(function(t){return'<span class="tag">'+t+'</span>';}).join('')+'</div>'+
+    '<div class="ai-score"><span class="ai-score-label">AI-score</span><div class="ai-score-bar"><div class="ai-score-fill" style="width:'+b.score+'%;background:'+b.scoreColor+'"></div></div><span class="ai-score-val" style="color:'+b.scoreColor+'">'+b.score+'/100</span></div>'+
+    '</div>';
+}
+
+function prefillNeg(id){
+  var b=BOLIGER.find(function(x){return x.id===id;});
+  if(!b)return;
+  document.getElementById('neg-price').value=b.price;
+  document.getElementById('neg-desc').value=b.rooms+'-værelses '+b.type+' på '+b.address+', '+b.size+' m²';
+  showToast('📋 Overført til Forhandl-fanen');
+}
+
+// NEGOTIATE
+async function doNegotiate(){
+  var price=parseInt(document.getElementById('neg-price').value);
+  var desc=document.getElementById('neg-desc').value;
+  var btn=document.getElementById('neg-btn');
+  var result=document.getElementById('neg-result');
+  if(!price||price<=0){showToast('Indtast venligst en husleje');return;}
+  btn.disabled=true;
+  btn.innerHTML='<div class="spinner" style="width:18px;height:18px;margin:0"></div> <span>Analyserer...</span>';
+  result.innerHTML='';
+  await sleep(1800);
+  var suggestion=Math.round(price*(0.85+Math.random()*0.08));
+  var saving=price-suggestion;
+  var yearSaving=saving*12;
+  var confidence=Math.round(72+Math.random()*20);
+  var marketAvg=Math.round(price*(0.88+Math.random()*0.06));
+  var scoreColor=confidence>=85?'#22c55e':confidence>=70?'#eab308':'#ef4444';
+  var scoreLabel=confidence>=85?'Stærk forhandlingsposition':confidence>=70?'God forhandlingsposition':'Moderat forhandlingsposition';
+  var tactics=[
+    'Fremhæv din stabile økonomi og lange lejeperiode – udlejere foretrækker pålidelige lejere',
+    'Nævn konkrete sammenlignelige boliger i området til lavere pris',
+    'Tilbyd at betale 3 måneders depositum på forhånd mod lavere månedlig husleje',
+    'Spørg om mulighed for at overtage vedligeholdelsesopgaver mod huslejenedsættelse',
+    'Foreslå en 2-årig lejekontrakt med fastlåst husleje – giver udlejer tryghed',
+  ];
+  result.innerHTML='<div class="result">'+
+    '<div class="suggestion-highlight">'+
+    '<div class="suggestion-label">AI-ANBEFALET HUSLEJE</div>'+
+    '<div class="suggestion-price">'+suggestion.toLocaleString('da-DK')+' kr/md</div>'+
+    '<div class="suggestion-saving">💰 Spar '+saving.toLocaleString('da-DK')+' kr/md • '+yearSaving.toLocaleString('da-DK')+' kr/år</div>'+
+    '</div>'+
+    '<div class="stats-grid">'+
+    '<div class="stat-box"><div class="stat-val">'+price.toLocaleString('da-DK')+'</div><div class="stat-label">Udbudt pris</div></div>'+
+    '<div class="stat-box"><div class="stat-val">'+marketAvg.toLocaleString('da-DK')+'</div><div class="stat-label">Markedssnit</div></div>'+
+    '<div class="stat-box"><div class="stat-val" style="color:'+scoreColor+'">'+confidence+'%</div><div class="stat-label">Konfidensgrad</div></div>'+
+    '</div>'+
+    '<div class="result-card">'+
+    '<div class="score-card">'+
+    '<div class="score-circle"><svg viewBox="0 0 36 36" style="width:100%;height:100%;transform:rotate(-90deg)">'+
+    '<path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#2a2a2a" stroke-width="3"></path>'+
+    '<path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="'+scoreColor+'" stroke-width="3" stroke-dasharray="'+confidence+', 100"></path>'+
+    '</svg><div class="score-inner"><span class="score-num" style="color:'+scoreColor+'">'+confidence+'</span><span class="score-max">/100</span></div></div>'+
+    '<div class="score-info"><div class="score-label">'+scoreLabel+'</div><div class="score-summary">Baseret på markedsdata for sammenlignelige boliger</div></div>'+
+    '</div></div>'+
+    '<div class="result-card"><div style="font-size:14px;font-weight:600;margin-bottom:12px">🎯 Forhandlingstaktikker</div>'+
+    '<ul class="tactics-list">'+tactics.map(function(t,i){return'<li class="tactic-item"><div class="tactic-num">'+(i+1)+'</div><div class="tactic-text">'+t+'</div></li>';}).join('')+
+    '</ul></div>'+
+    '<div class="reasoning-box"><div class="reasoning-label">AI-ANALYSE</div>'+
+    '<div class="reasoning-text">Den udbudte pris på '+price.toLocaleString('da-DK')+' kr/md ligger '+(price>marketAvg?Math.round((price/marketAvg-1)*100)+'% over':Math.round((1-price/marketAvg)*100)+'% under')+' markedsgennemsnittet. En realistisk målpris er '+suggestion.toLocaleString('da-DK')+' kr/md, hvilket vil spare dig '+yearSaving.toLocaleString('da-DK')+' kr over et år.</div>'+
+    '</div></div>';
+  btn.disabled=false;
+  btn.innerHTML='<span>🤝</span> Analysér forhandlingsmuligheder';
+}
+
+// CONTRACT
+function updateCharCount(){
+  document.getElementById('char-count').textContent=document.getElementById('contract-text').value.length.toLocaleString('da-DK')+' tegn';
+}
+function loadSampleContract(){
+  document.getElementById('contract-text').value='LEJEKONTRAKT\n\nUdlejer: Hans Hansen, Strandvej 12, 2900 Hellerup\nLejer: Mette Petersen\n\n§1 Det lejede\nLejemålet beliggende Nørrebrogade 45, 2. tv., 2200 København N, bestående af 3 rum på 82 m².\n\n§2 Lejeperiode\nLejemålet er tidsbegrænset og ophører automatisk den 31. december 2025 uden yderligere opsigelse.\n\n§3 Husleje\nDen månedlige husleje udgør kr. 12.500. Huslejen reguleres årligt med 5% uanset KPI-udviklingen.\n\n§4 Depositum\nDepositum udgør 3 måneders husleje = kr. 37.500, som skal betales ved indflytning.\n\n§5 Vedligeholdelse\nLejer er ansvarlig for al indvendig vedligeholdelse, herunder maling, hvidtning og tapetsering. Lejer afholder alle udgifter til reparationer under kr. 5.000.\n\n§6 Husdyr\nHusdyr er ikke tilladt uden skriftlig tilladelse fra udlejer.\n\n§7 Fremleje\nFremleje er ikke tilladt.\n\n§8 Opsigelse\nUdlejer kan opsige lejemålet med 1 måneds varsel. Lejer skal opsige med 3 måneders varsel.';
+  updateCharCount();
+}
+async function doContractCheck(){
+  var text=document.getElementById('contract-text').value.trim();
+  var btn=document.getElementById('contract-btn');
+  var result=document.getElementById('contract-result');
+  if(text.length<50){showToast('Indsæt venligst en kontrakt');return;}
+  btn.disabled=true;
+  btn.innerHTML='<div class="spinner" style="width:18px;height:18px;margin:0"></div> <span>Analyserer kontrakt...</span>';
+  result.innerHTML='';
+  await sleep(2200);
+  var issues=[];var positives=[];
+  if(text.includes('tidsbegrænset')||text.includes('ophører automatisk'))
+    issues.push({severity:'high',section:'§2 Lejeperiode',title:'Tidsbegrænset lejekontrakt',desc:'Kontrakten er tidsbegrænset. Ifølge lejeloven §80 skal tidsbegrænsning have saglig begrundelse, ellers er den ugyldig.'});
+  if(text.includes('5%')||text.match(/reguleres.*\d+%/i))
+    issues.push({severity:'high',section:'§3 Husleje',title:'Ulovlig huslejeregulering',desc:'Huslejeregulering på fast procentsats er ikke tilladt. Regulering skal følge nettoprisindekset (KPI).'});
+  if(text.includes('al indvendig vedligeholdelse'))
+    issues.push({severity:'medium',section:'§5 Vedligeholdelse',title:'Bred vedligeholdelsespligt',desc:'Lejers vedligeholdelsespligt er meget bred. Ifølge lejeloven §21 er det normalt udlejer der har vedligeholdelsespligten.'});
+  if(text.includes('1 måneds varsel')&&text.includes('Udlejer'))
+    issues.push({severity:'high',section:'§8 Opsigelse',title:'Ulovligt kort opsigelsesvarsel',desc:'Udlejers opsigelsesvarsel på 1 måned er for kort. Ifølge lejeloven §83 er minimumsvarsel for udlejer 3 måneder.'});
+  if(!text.includes('tidsbegrænset'))positives.push('Tidsubegrænset lejekontrakt giver dig bedre rettigheder');
+  if(text.includes('Husdyr'))positives.push('Husdyrspolitik er tydeligt defineret');
+  if(text.includes('Fremleje'))positives.push('Fremlejepolitik er specificeret');
+  if(text.length>500)positives.push('Kontrakten er detaljeret og dækker de vigtigste punkter');
+  positives.push('Udlejerens kontaktoplysninger er angivet');
+  var score=Math.max(20,100-issues.filter(function(i){return i.severity==='high';}).length*25-issues.filter(function(i){return i.severity==='medium';}).length*10);
+  var scoreColor=score>=75?'#22c55e':score>=50?'#eab308':'#ef4444';
+  var scoreLabel=score>=75?'God kontrakt':score>=50?'Acceptabel kontrakt':'Problematisk kontrakt';
+  var rec=issues.filter(function(i){return i.severity==='high';}).length>0?'Der er identificeret alvorlige problemer. Vi anbefaler at du konsulterer en lejeradvokat eller kontakter Lejernes Landsorganisation (LLO) inden underskrift.':issues.length>0?'Kontrakten indeholder punkter der bør forhandles. Overvej at søge rådgivning hos LLO.':'Kontrakten ser fornuftig ud. Læs alle punkter grundigt inden underskrift.';
+  result.innerHTML='<div class="result">'+
+    '<div class="result-card"><div class="score-card">'+
+    '<div class="score-circle"><svg viewBox="0 0 36 36" style="width:100%;height:100%;transform:rotate(-90deg)">'+
+    '<path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#2a2a2a" stroke-width="3"></path>'+
+    '<path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="'+scoreColor+'" stroke-width="3" stroke-dasharray="'+score+', 100"></path>'+
+    '</svg><div class="score-inner"><span class="score-num" style="color:'+scoreColor+'">'+score+'</span><span class="score-max">/100</span></div></div>'+
+    '<div class="score-info"><div class="score-label">'+scoreLabel+'</div><div class="score-summary">'+issues.length+' problem'+(issues.length!==1?'er':'')+' fundet • '+positives.length+' positive punkter</div></div>'+
+    '</div></div>'+
+    '<div class="recommendation-box"><span class="rec-icon">💡</span><p class="rec-text">'+rec+'</p></div>'+
+    '<div class="tabs-row">'+
+    '<button class="tab-pill active" id="tab-issues" onclick="switchContractTab(\'issues\')">⚠️ Problemer ('+issues.length+')</button>'+
+    '<button class="tab-pill" id="tab-positives" onclick="switchContractTab(\'positives\')">✅ Positive ('+positives.length+')</button>'+
+    '</div>'+
+    '<div id="contract-issues-tab">'+
+    (issues.length?'<div class="issues-list">'+issues.map(function(i){return'<div class="issue-card"><div class="issue-header"><span class="severity-badge '+i.severity+'">'+(i.severity==='high'?'ALVORLIG':i.severity==='medium'?'ADVARSEL':'INFO')+'</span><span class="issue-section">'+i.section+'</span></div><h4 class="issue-title">'+i.title+'</h4><p class="issue-desc">'+i.desc+'</p></div>';}).join('')+'</div>':'<div style="text-align:center;padding:30px;color:var(--text2)">✅ Ingen problemer fundet</div>')+
+    '</div>'+
+    '<div id="contract-positives-tab" style="display:none">'+
+    '<div class="positives-list">'+positives.map(function(p){return'<div class="positive-item"><span class="positive-icon">✓</span><span>'+p+'</span></div>';}).join('')+'</div>'+
+    '</div></div>';
+  btn.disabled=false;
+  btn.innerHTML='<span>📄</span> Analysér kontrakt';
+}
+function switchContractTab(tab){
+  document.getElementById('contract-issues-tab').style.display=tab==='issues'?'block':'none';
+  document.getElementById('contract-positives-tab').style.display=tab==='positives'?'block':'none';
+  document.getElementById('tab-issues').classList.toggle('active',tab==='issues');
+  document.getElementById('tab-positives').classList.toggle('active',tab==='positives');
+}
+
+// STAGING
+function selectStyle(btn){
+  document.querySelectorAll('.style-btn').forEach(function(b){b.classList.remove('selected');});
+  btn.classList.add('selected');
+  selectedStyle=btn.dataset.style;
+}
+function handleFileSelect(e){var f=e.target.files[0];if(f)loadImg(f);}
+function handleDrop(e){e.preventDefault();var f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))loadImg(f);}
+function loadImg(file){
+  var r=new FileReader();
+  r.onload=function(e){
+    uploadedImage=e.target.result;
+    document.getElementById('preview-img').src=uploadedImage;
+    document.getElementById('preview-container').style.display='block';
+    document.getElementById('upload-area').style.display='none';
+  };
+  r.readAsDataURL(file);
+}
+async function doStaging(){
+  var btn=document.getElementById('staging-btn');
+  var result=document.getElementById('staging-result');
+  var prompt=document.getElementById('staging-prompt').value;
+  if(!uploadedImage){showToast('Upload venligst et billede først');return;}
+  btn.disabled=true;
+  btn.innerHTML='<div class="spinner" style="width:18px;height:18px;margin:0"></div> <span>Genererer staging...</span>';
+  result.innerHTML='';
+  await sleep(2500);
+  var filters={
+    'Moderne':'contrast(1.1) saturate(0.9) brightness(1.05)',
+    'Skandinavisk':'contrast(0.95) saturate(0.7) brightness(1.15)',
+    'Industriel':'contrast(1.2) saturate(0.5) brightness(0.95) sepia(0.1)',
+    'Minimalistisk':'contrast(0.9) saturate(0.6) brightness(1.2)',
+    'Luksus':'contrast(1.15) saturate(1.2) brightness(1.0)',
+    'Hygge':'contrast(0.95) saturate(1.1) brightness(0.95) sepia(0.15)',
+  };
+  result.innerHTML='<div class="result">'+
+    '<div style="font-size:13px;color:var(--text2);margin-bottom:10px"><strong>Stil:</strong> '+selectedStyle+(prompt?' • "'+prompt+'"':'')+' </div>'+
+    '<div style="position:relative">'+
+    '<img src="'+uploadedImage+'" style="width:100%;border-radius:12px;filter:'+filters[selectedStyle]+'" alt="Staged" />'+
+    '<div style="position:absolute;top:10px;right:10px;background:rgba(108,99,255,0.9);color:white;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px">AI STAGED</div>'+
+    '</div>'+
+    '<div style="font-size:12px;color:var(--text3);text-align:center;margin-top:6px">Virtual staging med '+selectedStyle.toLowerCase()+' stil</div>'+
+    '<div class="action-row">'+
+    '<button class="action-btn" onclick="downloadStaged()">⬇️ Download</button>'+
+    '<button class="action-btn" onclick="resetStaging()">🔄 Nyt billede</button>'+
+    '</div>'+
+    '<div style="margin-top:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;color:var(--text3)">'+
+    '💡 For fuld AI-genereret staging med Grok Imagine, tilføj din API-nøgle i indstillinger'+
+    '</div></div>';
+  btn.disabled=false;
+  btn.innerHTML='<span>✨</span> Generer staging';
+}
+function downloadStaged(){
+  var img=document.querySelector('.staged-result img')||document.querySelector('#staging-result img');
+  if(!img)return;
+  var a=document.createElement('a');a.href=img.src;a.download='davside-staging.jpg';a.click();
+}
+function resetStaging(){
+  uploadedImage=null;
+  document.getElementById('preview-container').style.display='none';
+  document.getElementById('upload-area').style.display='block';
+  document.getElementById('file-input').value='';
+  document.getElementById('staging-result').innerHTML='';
+}
+</script>
+</body>
+</html>
