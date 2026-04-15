@@ -43,33 +43,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Initialiser Android projektet hvis det mangler
-          # Pakkenavn og version styres nu primært via tauri.conf.json i v2
-          cargo tauri android init --ci
-          # Byg selve APK'en (brug kun arkitekturnavnet, ikke fuldt Rust-target format)
-          cargo tauri android build --target aarch64
-          
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: davside-ai-android-apk
-          path: src-tauri/gen/android/app/build/outputs/apk/release/*.apk
-        run: |
-          # Initialiser Android projektet hvis det mangler
-          # Pakkenavn og version styres nu primært via tauri.conf.json i v2
-          cargo tauri android init --ci
-          # Byg selve APK'en (brug kun arkitekturnavnet, ikke fuldt Rust-target format)
-          cargo tauri android build --target aarch64
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: davside-ai-android-apk
-          path: src-tauri/gen/android/app/build/outputs/apk/release/*.apk
-        run: |
-          # Initialiser Android projektet hvis det mangler
-          # Pakkenavn og version styres nu via tauri.conf.json i v2
           cargo tauri android init --ci
           # Byg selve APK'en
-          cargo tauri android build --target aarch64-linux-android
+          cargo tauri android build --target aarch64
+          
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
