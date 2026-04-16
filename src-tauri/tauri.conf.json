@@ -3,6 +3,7 @@
   "productName": "DAVSIDE AI",
   "version": "0.3.0",
   "identifier": "com.davside.ai",
+}
   {
   "build": {
     "beforeBuildCommand": "npm run build", 
@@ -11,7 +12,7 @@
   },
 }
   "build": {
-    "frontendDist": "DAVSIDEAI/frontend/dist",
+    "frontendDist": "/frontend/dist",
     "devUrl": "http://localhost:5173",
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build"
