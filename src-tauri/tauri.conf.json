@@ -9,7 +9,6 @@
     "beforeDevCommand": "npm run dev",
     "frontendDist": "../frontend/dist"
   },
-  ...
 }
   "build": {
     "frontendDist": "DAVSIDEAI/frontend/dist",
