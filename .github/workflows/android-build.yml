@@ -64,7 +64,7 @@ jobs:
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
         run: |
           if [ "${{ matrix.variant }}" = "release" ]; then
-            cargo tauri android build --release
+            cargo tauri android build -- --release
           else
             cargo tauri android build --debug
           fi
