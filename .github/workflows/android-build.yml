@@ -24,7 +24,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          # cache: 'npm' er fjernet her, da det kræver en package-lock.json fil i roden af projektet.
 
       - name: Setup Java 17
         uses: actions/setup-java@v4
@@ -34,6 +33,68 @@ jobs:
 
       - name: Setup Android SDK & NDK
         uses: android-actions/setup-android@v3
+        with:
+          ndk-version: r27
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android, armv7-linux-androideabi, i686-linux-android, x86_64-linux-android
+
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@v2
+
+      - name: List files for debugging
+        run: |
+          echo "Dette er filerne som GitHub Actions kan se lige nu:"
+          ls -la
+
+      - name: Install dependencies
+        # HVIS din package.json ligger i en undermappe, skal du fjerne '#' fra linjen nedenfor og ændre mappenavnet:
+        # working-directory: ./min-frontend-mappe
+        run: |
+          if [ ! -f "package.json" ]; then
+            echo "Fejl: Kunne ikke finde package.json!"
+            echo "1. Tjek at filen er committet og pushet til GitHub."
+            echo "2. Hvis filen ligger i en undermappe, skal du angive 'working-directory' i dette trin."
+            exit 1
+          fi
+
+          if [ -f "package-lock.json" ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --version "^2.0.0" --locked
+
+      - name: Build frontend
+        # Husk også 'working-directory' her, hvis din kode ligger i en undermappe.
+        run: npm run build
+
+      - name: Initialiser Android hvis nødvendigt
+        run: |
+          if [ ! -d "src-tauri/gen/android" ]; then
+            cargo tauri android init
+          fi
+
+      - name: Build ${{ matrix.variant }} APK
+        env:
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+        run: |
+          if [ "${{ matrix.variant }}" = "release" ]; then
+            cargo tauri android build --release
+          else
+            cargo tauri android build --debug
+          fi
+
+      - name: Upload ${{ matrix.variant }} APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: davside-ai-${{ matrix.variant }}-apk
+          path: src-tauri/gen/android/app/build/outputs/apk/${{ matrix.variant }}/*.apk
+          retention-days: 14
         with:
           ndk-version: r27
 
