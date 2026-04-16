@@ -9,7 +9,6 @@
     "beforeDevCommand": "npm run dev",
     "frontendDist": "../frontend/dist"
   },
-}
   "build": {
     "frontendDist": "/frontend/dist",
     "devUrl": "http://localhost:5173",
