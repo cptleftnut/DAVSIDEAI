@@ -3,22 +3,22 @@
   "productName": "DAVSIDE AI",
   "version": "0.3.0",
   "identifier": "com.davside.ai"
-},
+}
   "build": {
     "beforeBuildCommand": "npm run build", 
     "beforeDevCommand": "npm run dev"
     "frontendDist": "../frontend/dist"
-  },
+  }
   "build": {
     "frontendDist": "/frontend/dist",
     "devUrl": "http://localhost:5173",
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build"
-  },
+  }
   "app": {
     "security": {
       "capabilities": ["default"]
-    },
+    }
     "windows": [
       {
         "title": "DAVSIDE AI",
@@ -28,7 +28,7 @@
         "fullscreen": false
       }
     ]
-  },
+  }
   "bundle": {
     "active": true,
     "targets": "all",
@@ -36,7 +36,7 @@
       "minSdkVersion": 24,
       "versionCode": 3
     }
-  },
+  }
   "plugins": {
     "store": {}
   }
