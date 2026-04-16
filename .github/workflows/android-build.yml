@@ -60,7 +60,11 @@ jobs:
           java-version: '17'
 
           # Initialiser Android-projektet (hvis det ikke allerede findes)
-cargo tauri android init
+- name: Initialiser Android hvis nødvendigt
+  run: |
+    if [ ! -d "src-tauri/gen/android" ]; then
+      cargo tauri android init
+    fi
 
       - name: Build ${{ matrix.variant }} APK
         env:
@@ -76,6 +80,6 @@ cargo tauri android init
         uses: actions/upload-artifact@v4
         with:
           name: davside-ai-${{ matrix.variant }}-apk
-          path: DAVSIDEAI/src-tauri/gen/android/app/build/outputs/apk/\( {{ matrix.variant }}/app- \){{ matrix.variant }}.apk
+          path: DAVSIDEAI/src-tauri/gen/android/app/build/outputs/apk/\( {{ matrix.variant }}/app-\){{ matrix.variant }}.apk
           retention-days: 14# This is a basic workflow to help you get started with Actions
 
