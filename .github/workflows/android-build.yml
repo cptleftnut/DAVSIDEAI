@@ -46,16 +46,14 @@ jobs:
 
       - name: List files for debugging
         run: |
-          echo "Dette er filerne som GitHub Actions kan se lige nu:"
+          echo "Dette er filerne i hovedmappen:"
           ls -la
 
       - name: Install dependencies
         working-directory: ./frontend
         run: |
           if [ ! -f "package.json" ]; then
-            echo "Fejl: Kunne ikke finde package.json!"
-            echo "1. Tjek at filen er committet og pushet til GitHub."
-            echo "2. Tjek at 'frontend' er det rigtige mappenavn."
+            echo "Fejl: Kunne ikke finde package.json i frontend-mappen!"
             exit 1
           fi
 
@@ -72,15 +70,20 @@ jobs:
         working-directory: ./frontend
         run: npm run build
 
+      - name: Find Tauri (Debug)
+        run: |
+          echo "Leder efter Tauri konfigurationen i hele projektet..."
+          find . -name "tauri.conf.json" -o -name "tauri.conf.json5" -o -name "Tauri.toml"
+
       - name: Initialiser Android hvis nødvendigt
-        working-directory: ./frontend
+        # Fjernet working-directory. Vi antager src-tauri ligger i roden.
         run: |
           if [ ! -d "src-tauri/gen/android" ]; then
             cargo tauri android init
           fi
 
       - name: Build ${{ matrix.variant }} APK
-        working-directory: ./frontend
+        # Fjernet working-directory. Kører fra roden.
         env:
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
         run: |
@@ -94,6 +97,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: davside-ai-${{ matrix.variant }}-apk
-          # Stien er opdateret til at starte med frontend/
-          path: frontend/src-tauri/gen/android/app/build/outputs/apk/${{ matrix.variant }}/*.apk
+          # Path er rettet tilbage til roden
+          path: src-tauri/gen/android/app/build/outputs/apk/${{ matrix.variant }}/*.apk
           retention-days: 14
