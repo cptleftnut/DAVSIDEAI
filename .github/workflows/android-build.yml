@@ -87,5 +87,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: davside-ai-${{ matrix.variant }}-apk
-          path: src-tauri/gen/android/app/build/outputs/apk/${{ matrix.variant }}/app-${{ matrix.variant }}.apk
+          path: src-tauri/gen/android/app/build/outputs/apk/${{ matrix.variant }}/app- ${{ matrix.variant }}.apk
           retention-days: 14
