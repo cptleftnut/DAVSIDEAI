@@ -50,13 +50,12 @@ jobs:
           ls -la
 
       - name: Install dependencies
-        # HVIS din package.json ligger i en undermappe, skal du fjerne '#' fra linjen nedenfor og ændre mappenavnet:
         working-directory: ./frontend
         run: |
           if [ ! -f "package.json" ]; then
             echo "Fejl: Kunne ikke finde package.json!"
             echo "1. Tjek at filen er committet og pushet til GitHub."
-            echo "2. Hvis filen ligger i en undermappe, skal du angive 'working-directory' i dette trin."
+            echo "2. Tjek at 'frontend' er det rigtige mappenavn."
             exit 1
           fi
 
@@ -70,16 +69,18 @@ jobs:
         run: cargo install tauri-cli --version "^2.0.0" --locked
 
       - name: Build frontend
-        # Husk også 'working-directory' her, hvis din kode ligger i en undermappe.
+        working-directory: ./frontend
         run: npm run build
 
       - name: Initialiser Android hvis nødvendigt
+        working-directory: ./frontend
         run: |
           if [ ! -d "src-tauri/gen/android" ]; then
             cargo tauri android init
           fi
 
       - name: Build ${{ matrix.variant }} APK
+        working-directory: ./frontend
         env:
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
         run: |
@@ -93,5 +94,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: davside-ai-${{ matrix.variant }}-apk
-          path: src-tauri/gen/android/app/build/outputs/apk/${{ matrix.variant }}/*.apk
+          # Stien er opdateret til at starte med frontend/
+          path: frontend/src-tauri/gen/android/app/build/outputs/apk/${{ matrix.variant }}/*.apk
           retention-days: 14
