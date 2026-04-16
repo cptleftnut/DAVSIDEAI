@@ -27,6 +27,15 @@ jobs:
       - name: Cache Rust
         uses: Swatinem/rust-cache@v2
 
+        - name: Install dependencies
+  run: npm install
+
+- name: Build frontend
+  run: npm run build
+
+- name: Build Tauri app
+  uses: tauri-apps/tauri-action@v0
+
       - name: Install Tauri CLI
         run: cargo install tauri-cli --locked
 
