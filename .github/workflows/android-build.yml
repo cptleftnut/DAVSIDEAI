@@ -14,8 +14,7 @@ jobs:
     strategy:
       matrix:
         variant: [debug, release]
-
-    steps:
+steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
