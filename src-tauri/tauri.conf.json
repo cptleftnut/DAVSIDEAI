@@ -3,7 +3,7 @@
   "productName": "DAVSIDE AI",
   "version": "0.3.0",
   "identifier": "com.davside.ai"
-}
+},
   "build": {
     "beforeBuildCommand": "npm run build", 
     "beforeDevCommand": "npm run dev"
