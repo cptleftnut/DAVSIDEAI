@@ -51,7 +51,7 @@ jobs:
 
       - name: Install dependencies
         # HVIS din package.json ligger i en undermappe, skal du fjerne '#' fra linjen nedenfor og ændre mappenavnet:
-        # working-directory: ./min-frontend-mappe
+        working-directory: ./frontend
         run: |
           if [ ! -f "package.json" ]; then
             echo "Fejl: Kunne ikke finde package.json!"
