@@ -2,23 +2,18 @@
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "DAVSIDE AI",
   "version": "0.3.0",
-  "identifier": "com.davside.ai"
-}
+  "identifier": "com.davside.ai",
   "build": {
-    "beforeBuildCommand": "npm run build", 
-    "beforeDevCommand": "npm run dev"
-    "frontendDist": "../frontend/dist"
-  }
-  "build": {
-    "frontendDist": "/frontend/dist",
+    "frontendDist": "../frontend/dist",
     "devUrl": "http://localhost:5173",
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build"
-  }
+  },
   "app": {
+    "withGlobalTauri": true,
     "security": {
       "capabilities": ["default"]
-    }
+    },
     "windows": [
       {
         "title": "DAVSIDE AI",
@@ -28,15 +23,23 @@
         "fullscreen": false
       }
     ]
-  }
+  },
   "bundle": {
     "active": true,
     "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
     "android": {
       "minSdkVersion": 24,
       "versionCode": 3
     }
-  }
+  },
   "plugins": {
     "store": {}
   }
+}
