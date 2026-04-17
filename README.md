@@ -1,44 +1,34 @@
-# DAVSIDE AI 🏠
+# DAVSIDEAI – Workflow Fix Pakke
 
-**Din intelligente AI-boligagent** – en Tauri-mobilapp til det danske boligmarked.
+Denne pakke retter alle problemer der får GitHub Actions workflow `android-build.yml` til at fejle i [cptleftnut/DAVSIDEAI](https://github.com/cptleftnut/DAVSIDEAI).
 
-## Funktioner
+## Hvad var galt
 
-| Funktion | Beskrivelse |
-|---|---|
-| 🔍 **Boligsøgning** | Søg boliger i hele Danmark med AI-scoring og filtrering |
-| 🤝 **Forhandlingsagent** | AI-drevet forhandlingsstrategi med markedsdata og taktikker |
-| 📄 **Kontrakt-tjek** | Analysér lejekontrakten for ulovlige klausuler og problemer |
-| 📷 **Virtual Staging** | Transformér boligbilleder med AI-styling (6 stilarter) |
+1. **`src-tauri/tauri.conf.json` var ugyldig JSON** – manglede ydre `{}`, kommaer mellem sektioner, og indeholdt to duplikerede `"build"`-blokke. Tauri kunne ikke parse filen.
+2. **Manglende `src-tauri/capabilities/default.json`** – konfigurationen refererer `"capabilities": ["default"]`, men filen fandtes ikke. Tauri v2 kræver den for at bygge.
+3. **Manglende `src-tauri/icons/`** – Tauri kræver mindst ét ikon for at bygge en Android APK.
+4. **Workflow rettelser**:
+   - Tilføjet npm cache (hurtigere builds).
+   - NDK installeres nu eksplicit via `setup-android` packages, og `NDK_HOME`/`ANDROID_NDK_HOME` eksporteres (Tauri Android kræver det).
+   - Auto-genererer alle ikon-størrelser via `cargo tauri icon` før `android init`.
+   - `cargo tauri android build` bruger nu `--apk` flag (ellers laver den AAB by default).
+   - Upload-path bruger glob så både debug og release-varianter findes.
 
-## Tech Stack
+## Sådan installerer du fixet
 
-- **Frontend**: Svelte 5 + TypeScript + Vite + TailwindCSS
-- **Backend**: Rust + Tauri
-- **AI**: Grok (xAI) API til analyse og staging
+Kopiér disse filer ind i dit repo (overskriv eksisterende):
 
-## Kom i gang
-
-```bash
-# Installer afhængigheder
-cd frontend && npm install
-
-# Start dev server
-npm run dev
-
-# Byg til produktion
-npm run build
+```
+.github/workflows/android-build.yml
+src-tauri/tauri.conf.json
+src-tauri/capabilities/default.json    ← NY
+src-tauri/icons/icon.png                ← NY (placeholder, udskift med dit eget)
 ```
 
-## Konfiguration
+Commit og push til `main`. Workflow burde nu køre igennem.
 
-Tilføj din Grok API-nøgle via Setup Wizard (første gang) eller Indstillinger (⚙️).
+## Bemærk
 
-## Standalone Web Version
-
-En komplet standalone HTML-version uden afhængigheder findes i `frontend/dist/index.html`.
-Åbn den direkte i en browser eller server den med en simpel HTTP-server:
-
-```bash
-cd frontend/dist && python3 -m http.server 8080
-```
+- `icon.png` er et placeholder-ikon. Udskift det med dit endelige logo (1024×1024 PNG). Workflow'en kører `cargo tauri icon` der auto-genererer alle størrelser.
+- Hvis du vil signere release-APK'en skal du tilføje `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD` som GitHub secrets og udvide workflow.
+- `XAI_API_KEY` secret bruges allerede ved build (forudsat din Rust-kode læser den via `env!` eller runtime).
