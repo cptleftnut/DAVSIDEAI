@@ -1,0 +1,226 @@
+name: Build and Deploy DAVSIDEAI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Run Tests
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Run linter
+        run: pnpm check
+      
+      - name: Run tests
+        run: pnpm test
+      
+      - name: Build project
+        run: pnpm build
+
+  build-apk:
+    needs: test
+    runs-on: ubuntu-latest
+    name: Build APK
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      
+      - name: Build web assets
+        run: pnpm build
+      
+      - name: Create Capacitor config
+        run: |
+          cat > capacitor.config.json << 'EOF'
+          {
+            "appId": "com.davsideai.app",
+            "appName": "DAVSIDE AI",
+            "webDir": "dist",
+            "server": {
+              "androidScheme": "https"
+            },
+            "plugins": {
+              "SplashScreen": {
+                "launchShowDuration": 0
+              }
+            }
+          }
+          EOF
+      
+      - name: Install Capacitor
+        run: pnpm add -D @capacitor/core @capacitor/cli @capacitor/android
+      
+      - name: Initialize Capacitor Android
+        run: npx cap add android
+      
+      - name: Update Capacitor
+        run: npx cap sync android
+      
+      - name: Build APK with Gradle
+        working-directory: ./android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease
+      
+      - name: Sign APK
+        uses: r0adkll/sign-android-release@v1
+        id: sign_app
+        with:
+          releaseDirectory: android/app/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.ANDROID_SIGNING_KEY }}
+          alias: ${{ secrets.ANDROID_KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      
+      - name: Upload APK to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: davsideai-release
+          path: ${{ steps.sign_app.outputs.signedReleaseFile }}
+      
+      - name: Create Release
+        uses: actions/create-release@v1
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.run_number }}
+          release_name: Release v${{ github.run_number }}
+          body: |
+            ## DAVSIDEAI Release v${{ github.run_number }}
+            
+            ### Changes
+            - Automated build from main branch
+            - All tests passed
+            - APK ready for distribution
+            
+            ### Download
+            Download the APK file from the artifacts or use the direct link below.
+          draft: false
+          prerelease: false
+      
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.sign_app.outputs.signedReleaseFile }}
+          asset_name: davsideai-${{ github.run_number }}.apk
+          asset_content_type: application/vnd.android.package-archive
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    name: Deploy to Production
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Build project
+        run: pnpm build
+      
+      - name: Deploy to hosting
+        run: |
+          echo "Deployment would happen here"
+          echo "Configure your hosting provider (Vercel, Netlify, Railway, etc.)"
+          echo "Or use: manus-upload-file to push to S3"
+
+  push-to-github:
+    needs: test
+    runs-on: ubuntu-latest
+    name: Push to GitHub
+    if: github.event_name == 'push'
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Configure Git
+        run: |
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+      
+      - name: Push to main
+        run: |
+          git push origin main || true
+      
+      - name: Create GitHub Release Notes
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const changelog = fs.readFileSync('CHANGELOG.md', 'utf8');
+            github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: `v${new Date().toISOString().split('T')[0]}`,
+              name: `Release ${new Date().toISOString().split('T')[0]}`,
+              body: changelog,
+              draft: false,
+              prerelease: false
+            }).catch(() => console.log('Release already exists'));

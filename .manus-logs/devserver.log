@@ -1,0 +1,157 @@
+[2026-04-15T08:04:15.725Z] Starting dev server with command: pnpm run dev
+[2026-04-15T08:04:16.600Z] 
+[2026-04-15T08:04:16.601Z] > davsideai-website@1.0.0 dev /home/ubuntu/davsideai-website
+[2026-04-15T08:04:16.601Z] > vite --host
+[2026-04-15T08:04:16.602Z] 
+[2026-04-15T08:04:17.174Z] 
+[2026-04-15T08:04:17.175Z] VITE v7.1.9  ready in 535 ms
+[2026-04-15T08:04:17.176Z] 
+[2026-04-15T08:04:17.176Z] ➜  Local:   http://localhost:3000/
+[2026-04-15T08:04:17.177Z] ➜  Network: http://169.254.0.21:3000/
+[2026-04-15T08:05:45.926Z] 4:05:45 AM [vite] (client) page reload index.html
+[2026-04-15T08:06:26.663Z] [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[2026-04-15T08:06:49.165Z] 4:06:49 AM [vite] (client) hmr update /src/index.css
+[2026-04-15T08:13:00.836Z] Dev server process group stopped
+[2026-04-15T08:13:00.839Z] ELIFECYCLE  Command failed.
+[2026-04-15T08:13:00.862Z] Dev server exited with code -15
+[2026-04-15T08:13:11.744Z] Starting dev server with command: NODE_ENV=development tsx watch server/_core/index.ts
+[2026-04-15T08:13:13.780Z] Dev server process group stopped
+[2026-04-15T08:13:13.818Z] [OAuth] Initialized with baseURL: https://api.manus.im
+[2026-04-15T08:13:14.130Z] Dev server exited with code -15
+[2026-04-15T08:13:16.805Z] Starting dev server with command: NODE_ENV=development tsx watch server/_core/index.ts
+[2026-04-15T08:13:18.685Z] [OAuth] Initialized with baseURL: https://api.manus.im
+[2026-04-15T08:13:18.992Z] 4:13:18 AM [vite] (client) Re-optimizing dependencies because lockfile has changed
+[2026-04-15T08:13:19.044Z] Server running on http://localhost:3000/
+[2026-04-15T08:14:13.311Z] 4:14:13 AM [tsx] change in ./drizzle/schema.ts Restarting...
+[2026-04-15T08:14:14.869Z] c[OAuth] Initialized with baseURL: https://api.manus.im
+[2026-04-15T08:14:15.126Z] Server running on http://localhost:3000/
+[2026-04-15T08:15:06.869Z] 4:15:06 AM [tsx] change in ./server/db.ts Restarting...
+[2026-04-15T08:15:08.570Z] c[OAuth] Initialized with baseURL: https://api.manus.im
+[2026-04-15T08:15:08.836Z] Server running on http://localhost:3000/
+[2026-04-15T08:15:16.350Z] 4:15:16 AM [tsx] change in ./server/db.ts Restarting...
+[2026-04-15T08:15:17.975Z] c[OAuth] Initialized with baseURL: https://api.manus.im
+[2026-04-15T08:15:18.259Z] Server running on http://localhost:3000/
+[2026-04-15T08:16:11.562Z] 4:16:11 AM [tsx] change in ./server/routers.ts Restarting...
+[2026-04-15T08:16:13.615Z] c[OAuth] Initialized with baseURL: https://api.manus.im
+[2026-04-15T08:16:13.877Z] Server running on http://localhost:3000/
+[2026-04-15T08:16:43.678Z] 4:16:43 AM [tsx] change in ./server/routers.ts Restarting...
+[2026-04-15T08:16:45.396Z] c[OAuth] Initialized with baseURL: https://api.manus.im
+[2026-04-15T08:16:45.654Z] Server running on http://localhost:3000/
+[2026-04-15T08:16:47.310Z] 4:16:47 AM [tsx] change in ./server/routers.ts Restarting...
+[2026-04-15T08:16:49.035Z] c[OAuth] Initialized with baseURL: https://api.manus.im
+[2026-04-15T08:16:49.287Z] Server running on http://localhost:3000/
+[2026-04-15T08:16:50.431Z] [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[2026-04-15T08:17:41.482Z] 4:17:41 AM [vite] (client) hmr update /src/pages/Home.tsx, /src/index.css
+[2026-04-15T08:17:58.329Z] 4:17:58 AM [tsx] change in ./server/db.ts Restarting...
+[2026-04-15T08:17:59.874Z] c[OAuth] Initialized with baseURL: https://api.manus.im
+[2026-04-15T08:18:00.122Z] Server running on http://localhost:3000/
+[2026-04-15T08:18:39.743Z] 4:18:39 AM [tsx] change in ./server/routers.ts Restarting...
+[2026-04-15T08:18:41.399Z] c[OAuth] Initialized with baseURL: https://api.manus.im
+[2026-04-15T08:18:41.656Z] Server running on http://localhost:3000/
+[2026-04-15T08:18:48.352Z] [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[2026-04-17T14:53:05.061Z] Dev server process group stopped
+[2026-04-17T14:53:05.110Z] Dev server exited with code -15
+[2026-04-17T14:53:08.074Z] Starting dev server with command: NODE_ENV=development tsx watch server/_core/index.ts
+[2026-04-17T14:53:09.795Z] [OAuth] Initialized with baseURL: https://api.manus.im
+[2026-04-17T14:53:10.079Z] 10:53:10 AM [vite] (client) Re-optimizing dependencies because lockfile has changed
+[2026-04-17T14:53:10.103Z] Server running on http://localhost:3000/
+[2026-04-17T14:53:57.149Z] [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[2026-04-17T14:56:42.838Z] 10:56:42 AM [vite] changed tsconfig file detected: /home/ubuntu/davsideai-website/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
+[2026-04-17T14:56:42.840Z] 10:56:42 AM [vite] (client) page reload index.html
+[2026-04-17T14:56:42.840Z] 10:56:42 AM [vite] (client) page reload public/.gitkeep
+[2026-04-17T14:56:42.841Z] 10:56:42 AM [vite] (client) page reload public/__manus__/debug-collector.js
+[2026-04-17T14:56:42.841Z] 10:56:42 AM [vite] (client) page reload src/App.tsx
+[2026-04-17T14:56:42.841Z] 10:56:42 AM [vite] (client) page reload src/_core/hooks/useAuth.ts
+[2026-04-17T14:56:42.841Z] 10:56:42 AM [vite] (client) page reload src/components/AIChatBox.tsx
+[2026-04-17T14:56:42.842Z] 10:56:42 AM [vite] (client) page reload src/components/DashboardLayout.tsx
+[2026-04-17T14:56:42.842Z] 10:56:42 AM [vite] (client) page reload src/components/DashboardLayoutSkeleton.tsx
+[2026-04-17T14:56:42.842Z] 10:56:42 AM [vite] (client) page reload src/components/ErrorBoundary.tsx
+[2026-04-17T14:56:42.843Z] 10:56:42 AM [vite] (client) page reload src/components/ManusDialog.tsx
+[2026-04-17T14:56:42.843Z] 10:56:42 AM [vite] (client) page reload src/components/Map.tsx
+[2026-04-17T14:56:42.843Z] 10:56:42 AM [vite] (client) page reload src/components/ui/accordion.tsx
+[2026-04-17T14:56:42.844Z] 10:56:42 AM [vite] (client) page reload src/components/ui/alert-dialog.tsx
+[2026-04-17T14:56:42.844Z] 10:56:42 AM [vite] (client) page reload src/components/ui/alert.tsx
+[2026-04-17T14:56:42.844Z] 10:56:42 AM [vite] (client) page reload src/components/ui/aspect-ratio.tsx
+[2026-04-17T14:56:42.844Z] 10:56:42 AM [vite] (client) page reload src/components/ui/avatar.tsx
+[2026-04-17T14:56:42.845Z] 10:56:42 AM [vite] (client) page reload src/components/ui/badge.tsx
+[2026-04-17T14:56:42.845Z] 10:56:42 AM [vite] (client) page reload src/components/ui/breadcrumb.tsx
+[2026-04-17T14:56:42.845Z] 10:56:42 AM [vite] (client) page reload src/components/ui/button-group.tsx
+[2026-04-17T14:56:42.846Z] 10:56:42 AM [vite] (client) page reload src/components/ui/button.tsx
+[2026-04-17T14:56:42.846Z] 10:56:42 AM [vite] (client) page reload src/components/ui/calendar.tsx
+[2026-04-17T14:56:42.847Z] 10:56:42 AM [vite] (client) page reload src/components/ui/card.tsx
+[2026-04-17T14:56:42.847Z] 10:56:42 AM [vite] (client) page reload src/components/ui/carousel.tsx
+[2026-04-17T14:56:42.848Z] 10:56:42 AM [vite] (client) page reload src/components/ui/chart.tsx
+[2026-04-17T14:56:42.849Z] 10:56:42 AM [vite] (client) page reload src/components/ui/checkbox.tsx
+[2026-04-17T14:56:42.849Z] 10:56:42 AM [vite] (client) page reload src/components/ui/collapsible.tsx
+[2026-04-17T14:56:42.850Z] 10:56:42 AM [vite] (client) page reload src/components/ui/command.tsx
+[2026-04-17T14:56:42.850Z] 10:56:42 AM [vite] (client) page reload src/components/ui/context-menu.tsx
+[2026-04-17T14:56:42.850Z] 10:56:42 AM [vite] (client) page reload src/components/ui/dialog.tsx
+[2026-04-17T14:56:42.850Z] 10:56:42 AM [vite] (client) page reload src/components/ui/drawer.tsx
+[2026-04-17T14:56:42.851Z] 10:56:42 AM [vite] (client) page reload src/components/ui/dropdown-menu.tsx
+[2026-04-17T14:56:42.851Z] 10:56:42 AM [vite] (client) page reload src/components/ui/empty.tsx
+[2026-04-17T14:56:42.851Z] 10:56:42 AM [vite] (client) page reload src/components/ui/field.tsx
+[2026-04-17T14:56:42.851Z] 10:56:42 AM [vite] (client) page reload src/components/ui/form.tsx
+[2026-04-17T14:56:42.852Z] 10:56:42 AM [vite] (client) page reload src/components/ui/hover-card.tsx
+[2026-04-17T14:56:42.852Z] 10:56:42 AM [vite] (client) page reload src/components/ui/input-group.tsx
+[2026-04-17T14:56:42.852Z] 10:56:42 AM [vite] (client) page reload src/components/ui/input-otp.tsx
+[2026-04-17T14:56:42.852Z] 10:56:42 AM [vite] (client) page reload src/components/ui/input.tsx
+[2026-04-17T14:56:42.853Z] 10:56:42 AM [vite] (client) page reload src/components/ui/item.tsx
+[2026-04-17T14:56:42.853Z] 10:56:42 AM [vite] (client) page reload src/components/ui/kbd.tsx
+[2026-04-17T14:56:42.853Z] 10:56:42 AM [vite] (client) page reload src/components/ui/label.tsx
+[2026-04-17T14:56:42.853Z] 10:56:42 AM [vite] (client) page reload src/components/ui/menubar.tsx
+[2026-04-17T14:56:42.854Z] 10:56:42 AM [vite] (client) page reload src/components/ui/navigation-menu.tsx
+[2026-04-17T14:56:42.854Z] 10:56:42 AM [vite] (client) page reload src/components/ui/pagination.tsx
+[2026-04-17T14:56:42.854Z] 10:56:42 AM [vite] (client) page reload src/components/ui/popover.tsx
+[2026-04-17T14:56:42.855Z] 10:56:42 AM [vite] (client) page reload src/components/ui/progress.tsx
+[2026-04-17T14:56:42.855Z] 10:56:42 AM [vite] (client) page reload src/components/ui/radio-group.tsx
+[2026-04-17T14:56:42.855Z] 10:56:42 AM [vite] (client) page reload src/components/ui/resizable.tsx
+[2026-04-17T14:56:42.855Z] 10:56:42 AM [vite] (client) page reload src/components/ui/scroll-area.tsx
+[2026-04-17T14:56:42.856Z] 10:56:42 AM [vite] (client) page reload src/components/ui/select.tsx
+[2026-04-17T14:56:42.856Z] 10:56:42 AM [vite] (client) page reload src/components/ui/separator.tsx
+[2026-04-17T14:56:42.856Z] 10:56:42 AM [vite] (client) page reload src/components/ui/sheet.tsx
+[2026-04-17T14:56:42.857Z] 10:56:42 AM [vite] (client) page reload src/components/ui/sidebar.tsx
+[2026-04-17T14:56:42.857Z] 10:56:42 AM [vite] (client) page reload src/components/ui/skeleton.tsx
+[2026-04-17T14:56:42.857Z] 10:56:42 AM [vite] (client) page reload src/components/ui/slider.tsx
+[2026-04-17T14:56:42.857Z] 10:56:42 AM [vite] (client) page reload src/components/ui/sonner.tsx
+[2026-04-17T14:56:42.858Z] 10:56:42 AM [vite] (client) page reload src/components/ui/spinner.tsx
+[2026-04-17T14:56:42.858Z] 10:56:42 AM [vite] (client) page reload src/components/ui/switch.tsx
+[2026-04-17T14:56:42.858Z] 10:56:42 AM [vite] (client) page reload src/components/ui/table.tsx
+[2026-04-17T14:56:42.858Z] 10:56:42 AM [vite] (client) page reload src/components/ui/tabs.tsx
+[2026-04-17T14:56:42.859Z] 10:56:42 AM [vite] (client) page reload src/components/ui/textarea.tsx
+[2026-04-17T14:56:42.859Z] 10:56:42 AM [vite] (client) page reload src/components/ui/toggle-group.tsx
+[2026-04-17T14:56:42.859Z] 10:56:42 AM [vite] (client) page reload src/components/ui/toggle.tsx
+[2026-04-17T14:56:42.859Z] 10:56:42 AM [vite] (client) page reload src/components/ui/tooltip.tsx
+[2026-04-17T14:56:42.860Z] 10:56:42 AM [vite] (client) page reload src/const.ts
+[2026-04-17T14:56:42.860Z] 10:56:42 AM [vite] (client) page reload src/contexts/ThemeContext.tsx
+[2026-04-17T14:56:42.860Z] 10:56:42 AM [vite] (client) page reload src/hooks/useComposition.ts
+[2026-04-17T14:56:42.861Z] 10:56:42 AM [vite] (client) page reload src/hooks/useMobile.tsx
+[2026-04-17T14:56:42.861Z] 10:56:42 AM [vite] (client) page reload src/hooks/usePersistFn.ts
+[2026-04-17T14:56:42.861Z] 10:56:42 AM [vite] (client) hmr update /src/index.css
+[2026-04-17T14:56:42.861Z] 10:56:42 AM [vite] (client) page reload src/lib/trpc.ts
+[2026-04-17T14:56:42.862Z] 10:56:42 AM [vite] (client) page reload src/lib/utils.ts
+[2026-04-17T14:56:42.862Z] 10:56:42 AM [vite] (client) page reload src/main.tsx
+[2026-04-17T14:56:42.862Z] 10:56:42 AM [vite] (client) page reload src/pages/ComponentShowcase.tsx
+[2026-04-17T14:56:42.862Z] 10:56:42 AM [vite] (client) page reload src/pages/Home.tsx
+[2026-04-17T14:56:42.863Z] 10:56:42 AM [vite] (client) page reload src/pages/NotFound.tsx
+[2026-04-17T14:56:42.863Z] 10:56:42 AM [vite] (client) page reload /home/ubuntu/davsideai-website/shared/const.ts
+[2026-04-17T14:56:42.948Z] 10:56:42 AM [tsx] unlink in ./vite.config.ts Restarting...
+[2026-04-17T14:56:43.175Z] c
+[2026-04-17T14:56:43.176Z] node:internal/modules/run_main:122
+[2026-04-17T14:56:43.176Z] triggerUncaughtException(
+[2026-04-17T14:56:43.176Z] ^
+[2026-04-17T14:56:43.177Z] Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/home/ubuntu/davsideai-website/server/_core/index.ts' imported from /home/ubuntu/davsideai-website/
+[2026-04-17T14:56:43.177Z] at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+[2026-04-17T14:56:43.177Z] at moduleResolve (node:internal/modules/esm/resolve:932:10)
+[2026-04-17T14:56:43.178Z] at defaultResolve (node:internal/modules/esm/resolve:1056:11)
+[2026-04-17T14:56:43.178Z] at nextResolve (node:internal/modules/esm/hooks:748:28)
+[2026-04-17T14:56:43.178Z] at resolveBase (file:///home/ubuntu/davsideai-website/node_modules/.pnpm/tsx@4.20.6/node_modules/tsx/dist/esm/index.mjs?1776437803076:2:3744)
+[2026-04-17T14:56:43.178Z] at resolveDirectory (file:///home/ubuntu/davsideai-website/node_modules/.pnpm/tsx@4.20.6/node_modules/tsx/dist/esm/index.mjs?1776437803076:2:4243)
+[2026-04-17T14:56:43.179Z] at resolveTsPaths (file:///home/ubuntu/davsideai-website/node_modules/.pnpm/tsx@4.20.6/node_modules/tsx/dist/esm/index.mjs?1776437803076:2:4984)
+[2026-04-17T14:56:43.179Z] at resolve (file:///home/ubuntu/davsideai-website/node_modules/.pnpm/tsx@4.20.6/node_modules/tsx/dist/esm/index.mjs?1776437803076:2:5361)
+[2026-04-17T14:56:43.179Z] at nextResolve (node:internal/modules/esm/hooks:748:28)
+[2026-04-17T14:56:43.180Z] at Hooks.resolve (node:internal/modules/esm/hooks:240:30) {
+[2026-04-17T14:56:43.180Z] code: 'ERR_MODULE_NOT_FOUND',
+[2026-04-17T14:56:43.180Z] url: 'file:///home/ubuntu/davsideai-website/server/_core/index.ts'
+[2026-04-17T14:56:43.180Z] }
+[2026-04-17T14:56:43.181Z] 
+[2026-04-17T14:56:43.181Z] Node.js v22.13.0
